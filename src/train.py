@@ -31,6 +31,13 @@ class ModelTrainer:
         # autoencoder train sample
         self.X_enc, self.train_lr = self.preprocessor.train_encoder(train)
 
+        # create test dataset
+        X_test, y_test = self.preprocessor.xy_split(test)
+        test = X_test, y_test
+        # save features
+        self.features = list(X_test.columns)
+        logger.info(f"Features: {self.features}")
+
         self.models = {}
         logger.info("Start multiprocessing training")
         start = time.time()
@@ -41,12 +48,6 @@ class ModelTrainer:
         logger.info(f"Running time (sec) using multiprocessing: {end}")
         logger.info("Finish multiprocessing training")
 
-        # create test dataset
-        X_test, y_test = self.preprocessor.xy_split(test)
-        test = X_test, y_test
-        # save features
-        self.features = list(X_test.columns)
-        logger.info(f"Features: {self.features}")
         logger.info("==========================================")
         return self.models, test
 
@@ -55,13 +56,13 @@ class ModelTrainer:
             logger.info(f"RandomForest")
             random_forest = RandomForest(self.train_base, self.features).train()
             self.models["RandomForest"] = random_forest
-        elif model_name == "Catboost":
-            logger.info(f"Catboost")
+        elif model_name == "Boosting":
+            logger.info(f"Boosting")
             catboost = Catboost(self.train_base, self.features).train()
             self.models["Boosting"] = catboost
         elif model_name == "Encoder":
             logger.info(f"Encoder")
-            lr_model, autoencoder = AutoEncoder(
+            autoencoder, lr_model = AutoEncoder(
                 self.X_enc, self.train_lr, self.features
             ).train()
             self.models["AutoEncoder"] = autoencoder

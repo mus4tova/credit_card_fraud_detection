@@ -4,7 +4,8 @@ from datetime import datetime
 
 from src.train import ModelTrainer
 from src.test import ModelTester
-from src.predict import ModelPredictor
+
+# from src.predict import ModelPredictor
 from src import settings
 
 # mlflow.set_tracking_uri(settings.TRACKING_URI)
@@ -26,7 +27,7 @@ def main():
     # elif args.predict:
     # experiment_name = "Antifraud predict"
     # mlflow.set_experiment(experiment_name)
-    # ModelPredictor(data_type).predict_all_models()
+    # ModelPredictor().predict_all_models()
 
     # else:
     # parser.print_help()

@@ -54,9 +54,7 @@ class ModelTester:
                 model_enc = self.models["AutoEncoder"]
                 model_lr = self.models["LogisticRegression"]
                 hid_rep = model_enc.predict(X_test)
-                y_pred_prob = model_lr(
-                    hid_rep, train=False
-                )  # model_lr.predict(hid_rep)
+                y_pred_prob = model_lr.predict(hid_rep)
 
             else:
                 logger.info(f"Start testing {model_name}")
@@ -64,7 +62,8 @@ class ModelTester:
                 y_pred_prob = model.predict(X_test)
             logger.info(f"y_pred_prob: {y_pred_prob}")
 
-            threshold = self.threshold_tuning(y_pred_prob, y_test, model_name)
+            # threshold = self.threshold_tuning(y_pred_prob, y_test, model_name)
+            threshold = 0.5
             thresholds_dict[model_name] = threshold
             y_pred = tf.cast(
                 y_pred_prob > threshold, tf.float32

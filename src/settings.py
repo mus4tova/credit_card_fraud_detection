@@ -18,6 +18,6 @@ if not os.path.isdir(PREDICTIONS_DIR):
 DROP_FEATURES = ["V14", "V16", "V21", "V23", "V24", "V26", "Time"]
 TARGET = ["Class"]
 
-MODELS_LIST = ["Encoder", "Catboost", "RandomForest"]
+MODELS_LIST = ["Encoder", "Boosting", "RandomForest"]
 
 SAMPLING_STRATEGY = 0.5

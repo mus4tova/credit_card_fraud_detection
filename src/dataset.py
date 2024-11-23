@@ -7,7 +7,7 @@ from collections import Counter
 from imblearn.under_sampling import RandomUnderSampler
 from sklearn.preprocessing import OrdinalEncoder, MinMaxScaler
 
-from src.settings import SAMPLING_STRATEGY, TARGET, MODELS_DIR, DROP_FEATURES
+from src.settings import SAMPLING_STRATEGY, TARGET, MODELS_DIR, DROP_FEATURES, BASE_DIR
 
 
 class DataLoader:
@@ -17,10 +17,10 @@ class DataLoader:
         if mode == "train":
             self.dataset = self.dataset[: self.length]
         elif mode == "predict":
-            self.dataset = self.dataset[self.length :]
+            self.dataset = self.dataset[self.length:]
 
     def load_data_from_file(self) -> pd.DataFrame:
-        df = pd.read_csv("creditcard.csv")
+        df = pd.read_csv(f"{BASE_DIR}/creditcard.csv")
         logger.info(f"Dataframe: \n{df.head(5)}")
         return df
 

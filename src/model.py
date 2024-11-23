@@ -13,6 +13,9 @@ from tensorflow.keras import Model, Sequential
 from tensorflow.keras.layers import Dense, Input
 from sklearn.model_selection import train_test_split
 
+# from skl2onnx import convert_sklearn
+# from skl2onnx.common.data_types import FloatTensorType
+
 from src.settings import MODELS_DIR
 
 
@@ -45,7 +48,7 @@ class Catboost:
             eval_set=val_data,
             use_best_model=True,
         )
-        ModelSaver().save_model(model, self.features, "Catboost")
+        # ModelSaver().save_model(model, self.features, "Catboost")
         return model
 
 
@@ -59,7 +62,7 @@ class RandomForest:
     def train(self) -> Pipeline:
         model = Pipeline([("rfc", RandomForestClassifier())])
         model.fit(self.X_train, self.y_train)
-        ModelSaver().save_model(model, self.features, "RandomForest")
+        # ModelSaver().save_model(model, self.features, "RandomForest")
         return model
 
 
@@ -76,13 +79,13 @@ class AutoEncoder:
 
     def train(self) -> Pipeline:
         # train 1st model - autoencoder
-        model = self.autoenc_model()
+        enc_model = self.autoenc_model()
         # get hidden representation using autoencoder
-        hidden_representation = self.hid_representaton(model)
+        hidden_representation = self.hid_representaton(enc_model)
         train = self.use_hid_rep(hidden_representation)
         # train 2nd model - logistic regression - by hidden representation
         lr_model = self.logistic_regr_model(train)
-        return lr_model
+        return enc_model, lr_model
 
     def use_hid_rep(
         self, hidden_representation: keras.Model
@@ -106,7 +109,8 @@ class AutoEncoder:
         X_train, y_train = train
         model = LogisticRegression()
         model.fit(X_train, y_train)
-        ModelSaver().save_model(model, X_train.shape[1], "AutoEncoder")
+        logger.info(f"model predict:{model.predict(X_train)}")
+        # ModelSaver().save_model(model, X_train.shape[1], "AutoEncoder")
         logger.info(f"model dtype:{model}")
         return model
 
@@ -169,7 +173,7 @@ class ModelSaver:
         X_shape: int,
         model_type: str,
     ):
-        if model_type == "Catboost":
+        if model_type == "Boosting":
             model.save_model(
                 "сtb.onnx",
                 format="onnx",
