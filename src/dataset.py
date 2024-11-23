@@ -4,6 +4,7 @@ import pandas as pd
 from loguru import logger
 from mlflow import log_param
 from collections import Counter
+from imblearn.over_sampling import SMOTE
 from imblearn.under_sampling import RandomUnderSampler
 from sklearn.preprocessing import OrdinalEncoder, MinMaxScaler
 
@@ -17,7 +18,7 @@ class DataLoader:
         if mode == "train":
             self.dataset = self.dataset[: self.length]
         elif mode == "predict":
-            self.dataset = self.dataset[self.length:]
+            self.dataset = self.dataset[self.length :]
 
     def load_data_from_file(self) -> pd.DataFrame:
         df = pd.read_csv(f"{BASE_DIR}/creditcard.csv")
@@ -79,7 +80,8 @@ class DataPreprocessor:
         )
 
         # balancing data
-        X_train, y_train = self.under_sampling(X_train, y_train)
+        # X_train, y_train = self.under_sampling(X_train, y_train)
+        X_train, y_train = self.over_sampling(X_train, y_train)
         log_param("Shape of X_train - base after balancing", X_train.shape)
         log_param(
             "Number of values in X_train - base after balancing", Counter(y_train)
@@ -136,5 +138,11 @@ class DataPreprocessor:
             sampling_strategy=SAMPLING_STRATEGY,
         ).fit_resample(X, y)
         X_bal, y_bal = X_bal.reset_index(drop=True), y_bal.reset_index(drop=True)
+        logger.info(f"Shape after balancing: {Counter(y_bal)}")
+        return X_bal, y_bal
+
+    def over_sampling(self, X: pd.DataFrame, y: pd.DataFrame):
+        logger.info(f"Shape before balancing: {Counter(y)}")
+        X_bal, y_bal = SMOTE().fit_resample(X, y)
         logger.info(f"Shape after balancing: {Counter(y_bal)}")
         return X_bal, y_bal
