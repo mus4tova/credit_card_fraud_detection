@@ -13,9 +13,6 @@ from tensorflow.keras import Model, Sequential
 from tensorflow.keras.layers import Dense, Input
 from sklearn.model_selection import train_test_split
 
-# from skl2onnx import convert_sklearn
-# from skl2onnx.common.data_types import FloatTensorType
-
 from src.settings import MODELS_DIR
 
 
@@ -48,7 +45,7 @@ class Catboost:
             eval_set=val_data,
             use_best_model=True,
         )
-        # ModelSaver().save_model(model, self.features, "Catboost")
+        ModelSaver().save_model(model, self.features, "Catboost")
         return model
 
 
@@ -62,7 +59,7 @@ class RandomForest:
     def train(self) -> Pipeline:
         model = Pipeline([("rfc", RandomForestClassifier())])
         model.fit(self.X_train, self.y_train)
-        # ModelSaver().save_model(model, self.features, "RandomForest")
+        ModelSaver().save_model(model, self.features, "RandomForest")
         return model
 
 
@@ -77,14 +74,16 @@ class AutoEncoder:
         self.X_enc = train_enc
         self.X_norm_lr, self.X_fraud_lr = train_lr
 
-    def train(self) -> Pipeline:
+    def train(self) -> tuple[keras.Model, Pipeline]:
         # train 1st model - autoencoder
         enc_model = self.autoenc_model()
+        #ModelSaver().save_model(enc_model, self.features, "AutoEncoder")
         # get hidden representation using autoencoder
         hidden_representation = self.hid_representaton(enc_model)
         train = self.use_hid_rep(hidden_representation)
         # train 2nd model - logistic regression - by hidden representation
         lr_model = self.logistic_regr_model(train)
+        ModelSaver().save_model(lr_model, self.features, "LogisticRegression")
         return enc_model, lr_model
 
     def use_hid_rep(
@@ -104,14 +103,11 @@ class AutoEncoder:
         return X_rep, y_rep
 
     def logistic_regr_model(
-        self, train: tuple[np.ndarray[np.ndarray], np.ndarray]
-    ) -> LogisticRegression:
+            self, train: tuple[np.ndarray[np.ndarray], np.ndarray]
+    ) -> Pipeline:
         X_train, y_train = train
-        model = LogisticRegression()
+        model = Pipeline([("lr", LogisticRegression(solver="lbfgs"))])
         model.fit(X_train, y_train)
-        logger.info(f"model predict:{model.predict(X_train)}")
-        # ModelSaver().save_model(model, X_train.shape[1], "AutoEncoder")
-        logger.info(f"model dtype:{model}")
         return model
 
     def autoenc_model(self) -> keras.Model:
@@ -168,29 +164,15 @@ class ModelSaver:
         pass
 
     def save_model(
-        self,
-        model: LogisticRegression | RandomForestClassifier | CatBoostClassifier,
-        X_shape: int,
-        model_type: str,
+        self, model: keras.Model | Pipeline | CatBoostClassifier, features: list[str], model_type: str
     ):
-        if model_type == "Boosting":
-            model.save_model(
-                "сtb.onnx",
-                format="onnx",
-                export_parameters={
-                    "onnx_domain": "ai.catboost",
-                    "onnx_model_version": 1,
-                    "onnx_doc_string": "test model for BinaryClassification",
-                    "onnx_graph_name": "CatBoostModel_for_BinaryClassification",
-                },
-            )
+        folder = f"{MODELS_DIR}/{model_type}"
+        if model_type == "Catboost":
+            model.save_model(f"{folder}")
         else:
-            folder = f"{MODELS_DIR}/{model_type}"
-            initial_type = [("float_input", FloatTensorType([None, X_shape]))]
-            onnx_model = convert_sklearn(
+            skl_to_pmml(
                 model,
-                initial_types=initial_type,
-                options={type(model): {"zipmap": False}},
+                features,
+                "traffic_filtration",
+                folder + ".pmml",
             )
-            with open(f"{folder}.onnx", "wb") as f:
-                f.write(onnx_model.SerializeToString())
