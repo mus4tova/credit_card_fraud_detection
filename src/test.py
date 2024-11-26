@@ -62,8 +62,7 @@ class ModelTester:
                 y_pred_prob = model.predict(X_test)
             logger.info(f"y_pred_prob: {y_pred_prob}")
 
-            # threshold = self.threshold_tuning(y_pred_prob, y_test, model_name)
-            threshold = 0.5
+            threshold = self.threshold_tuning(y_pred_prob, y_test, model_name)
             thresholds_dict[model_name] = threshold
             y_pred = tf.cast(
                 y_pred_prob > threshold, tf.float32
