@@ -3,12 +3,12 @@ services:
     build: .
     restart: 'no'
     volumes:
-      - /opt/fraud-detection/models/:/fraud-detection/models
+      - /credit_card_fraud_detection/models/:/credit_card_fraud_detection/models
     command: python src/main.py --train
 
   predict:
     build: .
     restart: 'no'
     volumes:
-      - /opt/fraud-detection/predictions/:/fraud-detection/predictions
+      - /credit_card_fraud_detection/predictions/:/credit_card_fraud_detection/predictions
     command: python src/main.py --predict

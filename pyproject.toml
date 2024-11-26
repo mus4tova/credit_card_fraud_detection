@@ -1,15 +1,15 @@
 [tool.poetry]
-name = "fraud-detection"
+name = "credit-card-fraud-detection"
 version = "0.1.0"
 description = ""
-authors = ["Natasha Musatova <n.musatova@astralab.ai>"]
+authors = ["Natasha Musatova <natali.schimpl@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "~3.10"
 pandas = "2.2.0"
 mlflow = "2.10.0"
-argparse = "^1.4.0"
+argparse = "1.4.0"
 loguru = "0.7.2"
 clickhouse-driver = "0.2.6"
 joblib = "1.3.2"
@@ -22,7 +22,7 @@ pydantic-settings = "2.1.0"
 tensorflow-io-gcs-filesystem = "0.31.0"
 tensorflow = "2.18.0"
 imblearn = "^0.0"
-ydf = "^0.8.0"
+ydf = "0.8.0"
 
 
 [build-system]

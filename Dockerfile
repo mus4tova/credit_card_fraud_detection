@@ -1,6 +1,6 @@
 FROM python:3.10
 
-WORKDIR /fraud-detection
+WORKDIR /credit_card_fraud_detection
 
 RUN pip install poetry==1.5.0
 
@@ -11,4 +11,4 @@ RUN poetry install --no-dev
 
 COPY . .
 
-ENV PYTHONPATH /fraud-detection
+ENV PYTHONPATH /credit_card_fraud_detection
