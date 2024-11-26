@@ -45,7 +45,7 @@ class Catboost:
             eval_set=val_data,
             use_best_model=True,
         )
-        ModelSaver().save_model(model, self.features, "Catboost")
+        ModelSaver().save_model(model, self.features, "Boosting")
         return model
 
 
@@ -77,7 +77,7 @@ class AutoEncoder:
     def train(self) -> tuple[keras.Model, Pipeline]:
         # train 1st model - autoencoder
         enc_model = self.autoenc_model()
-        #ModelSaver().save_model(enc_model, self.features, "AutoEncoder")
+        ModelSaver().save_model(enc_model, self.features, "AutoEncoder")
         # get hidden representation using autoencoder
         hidden_representation = self.hid_representaton(enc_model)
         train = self.use_hid_rep(hidden_representation)
@@ -103,7 +103,7 @@ class AutoEncoder:
         return X_rep, y_rep
 
     def logistic_regr_model(
-            self, train: tuple[np.ndarray[np.ndarray], np.ndarray]
+        self, train: tuple[np.ndarray[np.ndarray], np.ndarray]
     ) -> Pipeline:
         X_train, y_train = train
         model = Pipeline([("lr", LogisticRegression(solver="lbfgs"))])
@@ -164,11 +164,16 @@ class ModelSaver:
         pass
 
     def save_model(
-        self, model: keras.Model | Pipeline | CatBoostClassifier, features: list[str], model_type: str
+        self,
+        model: keras.Model | Pipeline | CatBoostClassifier,
+        features: list[str],
+        model_type: str,
     ):
         folder = f"{MODELS_DIR}/{model_type}"
-        if model_type == "Catboost":
+        if model_type == "Boosting":
             model.save_model(f"{folder}")
+        elif model_type == "AutoEncoder":
+            model.save(f"{folder}.keras")
         else:
             skl_to_pmml(
                 model,
