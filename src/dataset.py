@@ -8,7 +8,7 @@ from imblearn.over_sampling import SMOTE
 from imblearn.under_sampling import RandomUnderSampler
 from sklearn.preprocessing import OrdinalEncoder, MinMaxScaler
 
-from src.settings import SAMPLING_STRATEGY, TARGET, MODELS_DIR, DROP_FEATURES, BASE_DIR
+from src.settings import SAMPLING_STRATEGY, FEATURES, TARGET, MODELS_DIR, BASE_DIR
 
 
 class DataLoader:
@@ -16,13 +16,13 @@ class DataLoader:
         self.dataset = self.load_data_from_file()
         self.length = int(len(self.dataset) * 0.95)
         if mode == "train":
-            self.dataset = self.dataset[: self.length]
+            self.dataset = self.dataset[:self.length]
         elif mode == "predict":
-            self.dataset = self.dataset[self.length :]
+            self.dataset = self.dataset[self.length:]
 
     def load_data_from_file(self) -> pd.DataFrame:
         df = pd.read_csv(f"{BASE_DIR}/creditcard.csv")
-        logger.info(f"Dataframe: \n{df.head(5)}")
+        logger.info(f"Dataframe: \n{df}")
         return df
 
 
@@ -40,7 +40,7 @@ class DataPreprocessor:
         self.data = self.loader.dataset
 
         # drop columns where fraud class almost have no differences from non-fraud
-        self.data = self.data.drop(DROP_FEATURES, axis=1)
+        self.data = self.data[FEATURES + TARGET]
 
         # make sure that target column is integer
         self.data[self.target] = self.data[self.target].values.astype(np.int64)
