@@ -12,7 +12,7 @@ if not os.path.isdir(PREDICTIONS_DIR):
     os.mkdir(PREDICTIONS_DIR)
 
 # MLflow
-# TRACKING_URI = settings.MLFLOW_TRACKING_URI
+TRACKING_URI = "http://127.0.0.1:8080"
 
 # columns
 # drop features "V14", "V16", "V21", "V23", "V24", "V26", "Time"

@@ -8,6 +8,7 @@ COPY .env ./pyproject.toml ./poetry.lock ./
 
 RUN poetry config virtualenvs.create false
 RUN poetry install --no-dev
+RUN mlflow server --host 127.0.0.1 --port 8080
 
 COPY . .
 
