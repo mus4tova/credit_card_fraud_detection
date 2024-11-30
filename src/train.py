@@ -2,14 +2,13 @@ import time
 import pandas as pd
 from loguru import logger
 from mlflow import log_param
-from catboost import CatBoostClassifier
 from sklearn.pipeline import Pipeline
+from catboost import CatBoostClassifier
 from multiprocessing.pool import ThreadPool
 
-from src.dataset import DataPreprocessor
 from src.settings import MODELS_LIST
-from src.model import LogisticRegression
-from src.model import Catboost, RandomForest, AutoEncoder
+from src.dataset import DataPreprocessor
+from src.model import Boosting, RandomForest, Encoder
 
 
 class ModelTrainer:
@@ -26,17 +25,17 @@ class ModelTrainer:
         # dataset for boosting and random forest
         train, test = self.preprocessor.get_train_test()
 
-        # rf, catboost train sample
-        self.train_base = self.preprocessor.train_base(train)
-        # autoencoder train sample
-        self.X_enc, self.train_lr = self.preprocessor.train_encoder(train)
-
         # create test dataset
         X_test, y_test = self.preprocessor.xy_split(test)
         test = X_test, y_test
         # save features
         self.features = list(X_test.columns)
         logger.info(f"Features: {self.features}")
+
+        # rf, catboost train sample
+        self.train_base = self.preprocessor.train_base(train)
+        # autoencoder train sample
+        self.X_enc, self.train_lr = self.preprocessor.train_encoder(train)
 
         self.models = {}
         logger.info("Start multiprocessing training")
@@ -58,11 +57,11 @@ class ModelTrainer:
             self.models["RandomForest"] = random_forest
         elif model_name == "Boosting":
             logger.info(f"Boosting")
-            catboost = Catboost(self.train_base, self.features).train()
+            catboost = Boosting(self.train_base, self.features).train()
             self.models["Boosting"] = catboost
         elif model_name == "Encoder":
             logger.info(f"Encoder")
-            autoencoder, lr_model = AutoEncoder(
+            autoencoder, lr_model = Encoder(
                 self.X_enc, self.train_lr, self.features
             ).train()
             self.models["AutoEncoder"] = autoencoder

@@ -2,11 +2,10 @@ import pickle
 import numpy as np
 import pandas as pd
 from time import time
+import tensorflow as tf
 from loguru import logger
 from sklearn.pipeline import Pipeline
 from catboost import CatBoostClassifier
-from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier
 from mlflow import log_metric, log_figure, log_param
 from sklearn.metrics import (
     confusion_matrix,
@@ -19,7 +18,7 @@ from sklearn.metrics import (
     RocCurveDisplay,
     PrecisionRecallDisplay,
 )
-import tensorflow as tf
+
 from src.settings import MODELS_DIR, MODELS_LIST
 
 
@@ -81,15 +80,6 @@ class ModelTester:
         with open(f"{MODELS_DIR}/thresholds.pkl", "wb") as f:
             pickle.dump(thresholds_dict, f, pickle.HIGHEST_PROTOCOL)
         logger.info(f"threshold is saved")
-
-    @function_time
-    def predict(
-        self,
-        model: LogisticRegression | RandomForestClassifier | CatBoostClassifier,
-        X_test: np.ndarray[np.ndarray],
-    ) -> np.ndarray:
-        y_pred = model.predict(X_test)
-        return y_pred
 
     def threshold_tuning(
         self, y_pred_prob: np.ndarray, y_test: np.ndarray, model_name: str

@@ -14,6 +14,9 @@ if not os.path.isdir(PREDICTIONS_DIR):
 # MLflow
 TRACKING_URI = "http://127.0.0.1:8080"
 
+# list of models
+MODELS_LIST = ["Boosting", "RandomForest", "Encoder"]
+
 # columns
 # drop features "V14", "V16", "V21", "V23", "V24", "V26", "Time"
 FEATURES = [
@@ -42,5 +45,3 @@ FEATURES = [
     "Amount",
 ]
 TARGET = ["Class"]
-MODELS_LIST = ["Boosting", "RandomForest", "Encoder"]
-SAMPLING_STRATEGY = 0.5
