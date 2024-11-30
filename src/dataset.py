@@ -1,14 +1,12 @@
-import joblib
 import numpy as np
 import pandas as pd
 from loguru import logger
 from mlflow import log_param
 from collections import Counter
 from imblearn.over_sampling import SMOTE
-from imblearn.under_sampling import RandomUnderSampler
 from sklearn.preprocessing import OrdinalEncoder, MinMaxScaler
 
-from src.settings import SAMPLING_STRATEGY, FEATURES, TARGET, MODELS_DIR, BASE_DIR
+from src.settings import FEATURES, TARGET, BASE_DIR
 
 
 class DataLoader:
@@ -80,7 +78,6 @@ class DataPreprocessor:
         )
 
         # balancing data
-        # X_train, y_train = self.under_sampling(X_train, y_train)
         X_train, y_train = self.over_sampling(X_train, y_train)
         log_param("Shape of X_train - base after balancing", X_train.shape)
         log_param(
@@ -119,27 +116,10 @@ class DataPreprocessor:
         train_lr = X_norm_lr, X_fraud_lr
         return train_enc, train_lr
 
-    def encode_features(self, df: pd.DataFrame) -> pd.DataFrame:
-        df = self.encoder.fit_transform(df)
-        joblib.dump(self.encoder, f"{MODELS_DIR}/encoder.joblib")
-        return df
-
     def xy_split(self, df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
         X = df.drop(columns=self.target, axis=1)
         y = df[self.target]
         return X, y
-
-    def under_sampling(
-        self, X: pd.DataFrame, y: pd.DataFrame
-    ) -> tuple[pd.DataFrame, pd.DataFrame]:
-        logger.info(f"Shape before balancing: {Counter(y)}")
-        X_bal, y_bal = RandomUnderSampler(
-            random_state=0,
-            sampling_strategy=SAMPLING_STRATEGY,
-        ).fit_resample(X, y)
-        X_bal, y_bal = X_bal.reset_index(drop=True), y_bal.reset_index(drop=True)
-        logger.info(f"Shape after balancing: {Counter(y_bal)}")
-        return X_bal, y_bal
 
     def over_sampling(self, X: pd.DataFrame, y: pd.DataFrame):
         logger.info(f"Shape before balancing: {Counter(y)}")
