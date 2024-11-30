@@ -1,22 +1,21 @@
 import keras
 import numpy as np
 import pandas as pd
-from loguru import logger
 from mlflow import log_param
 from nyoka import skl_to_pmml
 from collections import Counter
 from sklearn.pipeline import Pipeline
 from catboost import CatBoostClassifier
-from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier
 from tensorflow.keras import Model, Sequential
 from tensorflow.keras.layers import Dense, Input
 from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
 
 from src.settings import MODELS_DIR
 
 
-class Catboost:
+class Boosting:
     model: CatBoostClassifier
 
     def __init__(self, train: tuple[pd.DataFrame, pd.DataFrame], features: list[str]):
@@ -63,7 +62,7 @@ class RandomForest:
         return model
 
 
-class AutoEncoder:
+class Encoder:
     def __init__(
         self,
         train_enc: pd.DataFrame,
