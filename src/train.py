@@ -28,6 +28,7 @@ class ModelTrainer:
         # create test dataset
         X_test, y_test = self.preprocessor.xy_split(test)
         test = X_test, y_test
+
         # save features
         self.features = list(X_test.columns)
         logger.info(f"Features: {self.features}")
