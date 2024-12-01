@@ -111,24 +111,22 @@ class Encoder:
 
     def autoenc_model(self) -> keras.Model:
         input_dim = self.X_enc.shape[1]
-        epochs = 1
+        epochs = 25
         batch_size = 256
         val_split = 0.2
 
         input_layer = Input(shape=(input_dim,))
 
         # encoder
-        encoded = Dense(512, activation="tanh")(input_layer)
-        encoded = Dense(256, activation="relu")(encoded)
+        encoded = Dense(256, activation="tanh")(input_layer)
         encoded = Dense(128, activation="relu")(encoded)
         encoded = Dense(64, activation="relu")(encoded)
         encoded = Dense(input_dim, activation="relu")(encoded)
 
         # decoder
-        decoded = Dense(64, activation="tanh")(encoded)
-        decoded = Dense(128, activation="tanh")(decoded)
+        decoded = Dense(64, activation="relu")(encoded)
+        decoded = Dense(128, activation="relu")(decoded)
         decoded = Dense(256, activation="tanh")(decoded)
-        decoded = Dense(512, activation="tanh")(decoded)
 
         # output
         output_layer = Dense(input_dim, activation="relu")(decoded)
@@ -154,7 +152,6 @@ class Encoder:
         hidden_representation.add(autoencoder.layers[2])
         hidden_representation.add(autoencoder.layers[3])
         hidden_representation.add(autoencoder.layers[4])
-        hidden_representation.add(autoencoder.layers[5])
         return hidden_representation
 
 
