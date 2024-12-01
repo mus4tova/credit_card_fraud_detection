@@ -1,6 +1,7 @@
 import keras
 import numpy as np
 import pandas as pd
+from loguru import logger
 from nyoka import skl_to_pmml
 from collections import Counter
 from sklearn.pipeline import Pipeline
