@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 from loguru import logger
+from collections import Counter
 from catboost import CatBoostClassifier
 from sklearn.preprocessing import MinMaxScaler
 from sklearn_pmml_model.auto_detect import auto_detect_estimator
@@ -50,6 +51,7 @@ class ModelPredictor:
         logger.info(f"Threshold: {thrsh}")
         logger.info(f"Predicted probability: {y_pred_prob}")
         logger.info(f"Predicted binary: {y_pred}")
+        logger.info(f"Counter: {Counter(y_pred)}")
         self.save_predictions(y_pred, model_type)
 
     def predict_all_models(self):

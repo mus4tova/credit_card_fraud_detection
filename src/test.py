@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 from time import time
 from loguru import logger
+from collections import Counter
 from sklearn.pipeline import Pipeline
 from catboost import CatBoostClassifier
 from sklearn.metrics import (
@@ -47,6 +48,7 @@ class ModelTester:
         X_test, y_test = self.test_dataset
         y_test = np.array(y_test)
         logger.info(f"X_test.shape:{X_test.shape}")
+        logger.info(f"X_test:{X_test}")
         for model_name in MODELS_LIST:
             if model_name == "Encoder":
                 model_enc = self.models["AutoEncoder"]
@@ -59,10 +61,10 @@ class ModelTester:
                 model = self.models[model_name]
                 y_pred_prob = model.predict_proba(X_test)[:, 1]
             logger.info(f"y_pred_prob: {y_pred_prob}")
-
             threshold = self.threshold_tuning(y_pred_prob, y_test, model_name)
             thresholds_dict[model_name] = threshold
             y_pred = (y_pred_prob >= threshold) * 1
+            logger.info(f"counter: {Counter(y_pred)}")
             self.cm, self.rec, self.pr, self.acc = self.model_evaluate(y_test, y_pred)
             self.log_metrics(model_name)
             self.log_graphics(y_test, y_pred_prob, model_name)
@@ -85,7 +87,7 @@ class ModelTester:
         times = 1000
         thrsh = 0
         for i in range(times):
-            gap = max(np.median(y_pred_prob), np.mean(y_pred_prob)) / times
+            gap = 1 / times
             preds = (y_pred_prob >= thrsh) * 1
             cm, rec, pr, acc = self.model_evaluate(y_test, preds)
             thrsh_ds.loc[i, "threshold"] = thrsh
@@ -96,7 +98,7 @@ class ModelTester:
         return threshold
 
     def threshold_choosing(self, thrsh_ds: pd.DataFrame, model_name: str) -> float:
-        slice = thrsh_ds[thrsh_ds.recall >= 0.75]
+        slice = thrsh_ds[thrsh_ds.recall >= 0.8]
         logger.info(f"Slice: {slice}")
         thrsh = slice.tail(1).threshold.values[0]
         logger.info(f"Threshold: {thrsh}")

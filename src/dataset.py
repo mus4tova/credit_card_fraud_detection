@@ -122,6 +122,6 @@ class DataPreprocessor:
         self, X: pd.DataFrame, y: pd.DataFrame
     ) -> tuple[pd.DataFrame, pd.DataFrame]:
         logger.info(f"Shape before balancing: {Counter(y)}")
-        X_bal, y_bal = SMOTE().fit_resample(X, y)
+        X_bal, y_bal = SMOTE(sampling_strategy=0.5).fit_resample(X, y)
         logger.info(f"Shape after balancing: {Counter(y_bal)}")
         return X_bal, y_bal
