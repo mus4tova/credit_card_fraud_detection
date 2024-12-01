@@ -47,52 +47,48 @@ class ModelTester:
 
         thresholds_dict = {}
         X_test, y_test = self.test_dataset
+        y_test = np.array(y_test)
         logger.info(f"X_test.shape:{X_test.shape}")
         for model_name in MODELS_LIST:
             if model_name == "Encoder":
                 model_enc = self.models["AutoEncoder"]
                 model_lr = self.models["LogisticRegression"]
                 hid_rep = model_enc.predict(X_test)
-                y_pred_prob = model_lr.predict(hid_rep)
+                y_pred_prob = model_lr.predict_proba(hid_rep)[:, 1]
 
             else:
                 logger.info(f"Start testing {model_name}")
                 model = self.models[model_name]
-                y_pred_prob = model.predict(X_test)
+                y_pred_prob = model.predict_proba(X_test)[:, 1]
             logger.info(f"y_pred_prob: {y_pred_prob}")
 
             threshold = self.threshold_tuning(y_pred_prob, y_test, model_name)
             thresholds_dict[model_name] = threshold
-            y_pred = tf.cast(
-                y_pred_prob > threshold, tf.float32
-            )  # (y_pred_prob >= threshold) * 1
-            logger.info(f"y_pred: {y_pred}")
+            y_pred = (y_pred_prob >= threshold) * 1
             self.cm, self.rec, self.pr, self.acc = self.model_evaluate(y_test, y_pred)
             self.log_metrics(model_name)
             self.log_graphics(y_test, y_pred_prob, model_name)
             logger.info("------------------------------------------")
         logger.info("Finish testing")
         self.save_threshold_dict(thresholds_dict)
-        logger.info(f"all")
 
     def save_threshold_dict(self, thresholds_dict: dict[str, float]):
-        logger.info(f"saving threshold")
+        logger.info(f"Saving threshold")
+        logger.info(f"Thresholds dictionary: \n{thresholds_dict}")
         with open(f"{MODELS_DIR}/thresholds.pkl", "wb") as f:
             pickle.dump(thresholds_dict, f, pickle.HIGHEST_PROTOCOL)
-        logger.info(f"threshold is saved")
+        logger.info(f"Thresholds are saved")
 
     def threshold_tuning(
         self, y_pred_prob: np.ndarray, y_test: np.ndarray, model_name: str
-    ):
-        logger.info(f"model_name: {model_name}")
+    ) -> float:
+        logger.info(f"Model name: {model_name}")
         thrsh_ds = pd.DataFrame()
         times = 1000
         thrsh = 0
         for i in range(times):
             gap = max(np.median(y_pred_prob), np.mean(y_pred_prob)) / times
-            preds = tf.cast(
-                y_pred_prob > thrsh, tf.float32
-            )  # (y_pred_prob >= thrsh) * 1
+            preds = (y_pred_prob >= thrsh) * 1
             cm, rec, pr, acc = self.model_evaluate(y_test, preds)
             thrsh_ds.loc[i, "threshold"] = thrsh
             thrsh_ds.loc[i, "recall"] = rec
@@ -101,9 +97,9 @@ class ModelTester:
         threshold = self.threshold_choosing(thrsh_ds, model_name)
         return threshold
 
-    def threshold_choosing(self, thrsh_ds: pd.DataFrame, model_name: str):
+    def threshold_choosing(self, thrsh_ds: pd.DataFrame, model_name: str) -> float:
         slice = thrsh_ds[thrsh_ds.recall >= 0.75]
-        logger.info(f"slice: {slice}")
+        logger.info(f"Slice: {slice}")
         thrsh = slice.tail(1).threshold.values[0]
         logger.info(f"Threshold: {thrsh}")
         log_param(f"Threshold for {model_name}", thrsh)
