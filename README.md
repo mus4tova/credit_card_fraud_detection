@@ -1,6 +1,6 @@
 # Credit card fraud detection
 
-The predictor is designed to detect fraudulent credit card activity. To do this, it uses three model architectures: Random Forest, CatBoost, and Autoencoder + Logistic Regression. In the documentation, the model using the combination of Autoencoder + Logistic Regression will often be referred to simply as Encoder. The predictor is launched via the terminal. All information about the training process and predictions is saved in MLflow.
+The predictor is designed to detect fraudulent credit card activity. To do this, it uses three model architectures: Random Forest, CatBoost, and Autoencoder + Logistic Regression. In the documentation, the model using the combination of Autoencoder + Logistic Regression will often be referred to simply as Encoder. The predictor is launched via the terminal.
 
 ## Models traning
 
