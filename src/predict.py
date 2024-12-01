@@ -35,7 +35,7 @@ class ModelPredictor:
             model_ctb.load_model(f"{MODELS_DIR}/{model_type}")
             y_pred_prob = model_ctb.predict_proba(self.data)[:, 1]
         elif model_type == "Encoder":
-            model_enc = tf.keras.models.load_model("AutoEncoder.keras")
+            model_enc = tf.keras.models.load_model(f"{MODELS_DIR}/AutoEncoder.keras")
             model_lr = auto_detect_estimator(
                 pmml=f"{MODELS_DIR}/LogisticRegression.pmml"
             )
