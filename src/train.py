@@ -1,7 +1,6 @@
 import time
 import pandas as pd
 from loguru import logger
-from mlflow import log_param
 from sklearn.pipeline import Pipeline
 from catboost import CatBoostClassifier
 from multiprocessing.pool import ThreadPool
@@ -44,7 +43,6 @@ class ModelTrainer:
         with ThreadPool() as p:
             p.map(self.train_one_model, self.models_list)
         end = time.time() - start
-        log_param("Running time using multiprocessing", end)
         logger.info(f"Running time (sec) using multiprocessing: {end}")
         logger.info("Finish multiprocessing training")
 

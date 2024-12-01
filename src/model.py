@@ -1,7 +1,6 @@
 import keras
 import numpy as np
 import pandas as pd
-from mlflow import log_param
 from nyoka import skl_to_pmml
 from collections import Counter
 from sklearn.pipeline import Pipeline
@@ -97,8 +96,10 @@ class Encoder:
         y_norm = np.zeros(hid_rep_norm.shape[0])
         y_fraud = np.ones(hid_rep_fraud.shape[0])
         y_rep = np.append(y_norm, y_fraud)
-        log_param("Shape of X_rep - logistic regression", X_rep.shape)
-        log_param("Number of values in X_rep - logistic regression", Counter(y_rep))
+        logger.info(f"Shape of X_rep - logistic regression: {X_rep.shape}")
+        logger.info(
+            f"Number of values in X_rep - logistic regression: {Counter(y_rep)}"
+        )
         return X_rep, y_rep
 
     def logistic_regr_model(

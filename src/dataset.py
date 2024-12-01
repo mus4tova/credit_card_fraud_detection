@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 from loguru import logger
-from mlflow import log_param
 from collections import Counter
 from imblearn.over_sampling import SMOTE
 from sklearn.preprocessing import OrdinalEncoder, MinMaxScaler
@@ -60,27 +59,27 @@ class DataPreprocessor:
         data_len = int(len(data) * 0.8)
         train, test = data[:data_len], data[data_len:]
 
-        log_param("Shape of test dataset", test.shape)
-        log_param("Shape of train dataset", train.shape)
-        log_param("Number of values in test", Counter(test[self.target]))
-        log_param("Number of values in train", Counter(train[self.target]))
+        logger.info(f"Shape of test dataset: {test.shape}")
+        logger.info(f"Shape of train dataset: {train.shape}")
+        logger.info(f"Number of values in test: {Counter(test[self.target])}")
+        logger.info(f"Number of values in train: {Counter(train[self.target])}")
         return train, test
 
     def train_base(self, train: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
         """method for catboost and random forest, is used after self.get_train_test(), return two arrays"""
         X_train, y_train = self.xy_split(train)
-
-        log_param("Shape of X_train - base before balancing", X_train.shape)
-        log_param(
-            "Number of values in X_train - base before balancing", Counter(y_train)
+        logger.info(f"Shape of X_train - base before balancing: {X_train.shape}")
+        logger.info(
+            f"Number of values in X_train - base before balancing: {Counter(y_train)}"
         )
 
         # balancing data
         X_train, y_train = self.over_sampling(X_train, y_train)
-        log_param("Shape of X_train - base after balancing", X_train.shape)
-        log_param(
-            "Number of values in X_train - base after balancing", Counter(y_train)
+        logger.info(f"Shape of X_train - base after balancing: {X_train.shape}")
+        logger.info(
+            f"Number of values in X_train - base after balancing: {Counter(y_train)}"
         )
+
         train = X_train, y_train
         return train
 
@@ -99,8 +98,8 @@ class DataPreprocessor:
 
         # sample for autoencoders
         X_enc, y_enc = self.xy_split(ds_enc)
-        log_param("Shape of X_enc - autoencoder", X_enc.shape)
-        log_param("Number of values in X_enc - autoencoder", Counter(y_enc))
+        logger.info(f"Shape of X_enc - autoencoder: {X_enc.shape}")
+        logger.info(f"Number of values in X_enc - autoencoder: {Counter(y_enc)}")
 
         # sample for logistic regression
         X_lr, y_lr = self.xy_split(ds_lr)

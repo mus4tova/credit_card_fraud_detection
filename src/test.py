@@ -2,11 +2,9 @@ import pickle
 import numpy as np
 import pandas as pd
 from time import time
-import tensorflow as tf
 from loguru import logger
 from sklearn.pipeline import Pipeline
 from catboost import CatBoostClassifier
-from mlflow import log_metric, log_figure, log_param
 from sklearn.metrics import (
     confusion_matrix,
     ConfusionMatrixDisplay,
@@ -102,7 +100,6 @@ class ModelTester:
         logger.info(f"Slice: {slice}")
         thrsh = slice.tail(1).threshold.values[0]
         logger.info(f"Threshold: {thrsh}")
-        log_param(f"Threshold for {model_name}", thrsh)
         return thrsh
 
     def model_evaluate(self, y_test: np.ndarray, y_pred: np.ndarray):
@@ -113,9 +110,9 @@ class ModelTester:
         return cm, rec, pr, acc
 
     def log_metrics(self, model_name: str):
-        log_metric(f"{model_name}_accuracy", self.acc)
-        log_metric(f"{model_name}_precision", self.pr)
-        log_metric(f"{model_name}_recall", self.rec)
+        logger.info(f"{model_name} accuracy:{self.acc}")
+        logger.info(f"{model_name} precision:{self.pr}")
+        logger.info(f"{model_name} recall:{self.rec}")
 
     def log_graphics(
         self, y_test: np.ndarray, y_pred_prob: np.ndarray, model_name: str
@@ -126,6 +123,6 @@ class ModelTester:
         roc_auc_curve = RocCurveDisplay(fpr=fpr, tpr=tpr).plot()
         disp = ConfusionMatrixDisplay(confusion_matrix=self.cm)
         disp.plot()
-        log_figure(pr_curve.figure_, f"{model_name}_PR_curve.png")
-        log_figure(roc_auc_curve.figure_, f"{model_name}_ROC_curve.png")
-        log_figure(disp.figure_, f"{model_name}_confusion_matrix.png")
+        # log_figure(pr_curve.figure_, f"{model_name}_PR_curve.png")
+        # log_figure(roc_auc_curve.figure_, f"{model_name}_ROC_curve.png")
+        # log_figure(disp.figure_, f"{model_name}_confusion_matrix.png")
