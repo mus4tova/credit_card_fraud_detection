@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from pathlib import Path
 from loguru import logger
 from collections import Counter
 from imblearn.over_sampling import SMOTE
@@ -10,6 +11,7 @@ from src.settings import FEATURES, TARGET, BASE_DIR
 
 class DataLoader:
     def __init__(self, mode: str):
+        self.download_file()
         self.dataset = self.load_data_from_file()
         self.length = int(len(self.dataset) * 0.95)
         if mode == "train":
@@ -17,8 +19,29 @@ class DataLoader:
         elif mode == "predict":
             self.dataset = self.dataset[self.length :]
 
+    def is_folder_empty(self, folder_path):
+        return not any(Path(folder_path).iterdir())
+
+    def download_file(self):
+        from kaggle.api.kaggle_api_extended import KaggleApi
+
+        # Initialize API
+        api = KaggleApi()
+        api.authenticate()
+
+        # Set path and name
+        dataset_name = "mlg-ulb/creditcardfraud"
+        save_path = f"{BASE_DIR}/datasets/"
+
+        # download dataset
+        if self.is_folder_empty(save_path):
+            api.dataset_download_files(dataset_name, path=save_path, unzip=True)
+            logger.info(f"Dataset downloaded and saved at {save_path}")
+        else:
+            logger.info(f"Dataset is already downloaded")
+
     def load_data_from_file(self) -> pd.DataFrame:
-        df = pd.read_csv(f"{BASE_DIR}/creditcard.csv")
+        df = pd.read_csv(f"{BASE_DIR}/datasets/creditcard.csv")
         logger.info(f"Dataframe: \n{df}")
         return df
 
