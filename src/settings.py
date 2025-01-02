@@ -12,7 +12,7 @@ if not os.path.isdir(PREDICTIONS_DIR):
     os.mkdir(PREDICTIONS_DIR)
 
 # MLflow
-TRACKING_URI = "http://127.0.0.1:8080"
+TRACKING_URI = "http://13.60.52.168:5000"
 
 # list of models
 MODELS_LIST = ["Boosting", "RandomForest", "Encoder"]

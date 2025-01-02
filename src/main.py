@@ -1,8 +1,14 @@
+import mlflow
 import argparse
+from datetime import datetime
 
+from src import settings
 from src.test import ModelTester
 from src.train import ModelTrainer
 from src.predict import ModelPredictor
+
+mlflow.set_tracking_uri(settings.TRACKING_URI)
+mlflow.set_experiment("Credit Card Fraud Detection")
 
 
 def main():
@@ -12,11 +18,17 @@ def main():
     args = parser.parse_args()
 
     if args.train:
-        models, test = ModelTrainer().train_all_models()
-        ModelTester(models, test).test_all_models()
+        with mlflow.start_run(
+            run_name="Train" + "/" + datetime.now().strftime("%Y-%m-%d %H:%M")
+        ):
+            models, test = ModelTrainer().train_all_models()
+            ModelTester(models, test).test_all_models()
 
     elif args.predict:
-        ModelPredictor().predict_all_models()
+        with mlflow.start_run(
+            run_name="Predict" + "/" + datetime.now().strftime("%Y-%m-%d %H:%M")
+        ):
+            ModelPredictor().predict_all_models()
 
     else:
         parser.print_help()
