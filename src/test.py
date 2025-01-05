@@ -1,4 +1,5 @@
 import pickle
+import mlflow
 import numpy as np
 import pandas as pd
 from time import time
@@ -48,6 +49,7 @@ class ModelTester:
         X_test, y_test = self.test_dataset
         y_test = np.array(y_test)
         logger.info(f"X_test.shape:{X_test.shape}")
+        mlflow.log_param("X_test.shape", X_test.shape)
         logger.info(f"X_test:{X_test}")
         for model_name in MODELS_LIST:
             if model_name == "Encoder":
@@ -75,6 +77,7 @@ class ModelTester:
     def save_threshold_dict(self, thresholds_dict: dict[str, float]):
         logger.info(f"Saving threshold")
         logger.info(f"Thresholds dictionary: \n{thresholds_dict}")
+        mlflow.log_param("Thresholds", thresholds_dict)
         with open(f"{MODELS_DIR}/thresholds.pkl", "wb") as f:
             pickle.dump(thresholds_dict, f, pickle.HIGHEST_PROTOCOL)
         logger.info(f"Thresholds are saved")
@@ -113,8 +116,11 @@ class ModelTester:
 
     def log_metrics(self, model_name: str):
         logger.info(f"{model_name} accuracy:{self.acc}")
+        mlflow.log_metric(f"{model_name} accuracy", self.acc)
         logger.info(f"{model_name} precision:{self.pr}")
+        mlflow.log_metric(f"{model_name} precision", self.pr)
         logger.info(f"{model_name} recall:{self.rec}")
+        mlflow.log_metric(f"{model_name} recall", self.rec)
 
     def log_graphics(
         self, y_test: np.ndarray, y_pred_prob: np.ndarray, model_name: str
@@ -125,6 +131,6 @@ class ModelTester:
         roc_auc_curve = RocCurveDisplay(fpr=fpr, tpr=tpr).plot()
         disp = ConfusionMatrixDisplay(confusion_matrix=self.cm)
         disp.plot()
-        # log_figure(pr_curve.figure_, f"{model_name}_PR_curve.png")
-        # log_figure(roc_auc_curve.figure_, f"{model_name}_ROC_curve.png")
-        # log_figure(disp.figure_, f"{model_name}_confusion_matrix.png")
+        mlflow.log_figure(pr_curve.figure_, f"{model_name}_PR_curve.png")
+        mlflow.log_figure(roc_auc_curve.figure_, f"{model_name}_ROC_curve.png")
+        mlflow.log_figure(disp.figure_, f"{model_name}_confusion_matrix.png")

@@ -1,4 +1,5 @@
 import keras
+import mlflow
 import numpy as np
 import pandas as pd
 from loguru import logger
@@ -100,6 +101,9 @@ class Encoder:
         logger.info(f"Shape of X_rep - logistic regression: {X_rep.shape}")
         logger.info(
             f"Number of values in X_rep - logistic regression: {Counter(y_rep)}"
+        )
+        mlflow.log_param(
+            "Number of values in X_rep - logistic regression", Counter(y_rep)
         )
         return X_rep, y_rep
 

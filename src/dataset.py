@@ -1,3 +1,4 @@
+import mlflow
 import numpy as np
 import pandas as pd
 from pathlib import Path
@@ -83,9 +84,13 @@ class DataPreprocessor:
         train, test = data[:data_len], data[data_len:]
 
         logger.info(f"Shape of test dataset: {test.shape}")
+        mlflow.log_param("Shape of test dataset", test.shape)
         logger.info(f"Shape of train dataset: {train.shape}")
+        mlflow.log_param("Shape of train dataset", train.shape)
         logger.info(f"Number of values in test: {Counter(test[self.target])}")
+        mlflow.log_param("Number of values in test", Counter(test[self.target]))
         logger.info(f"Number of values in train: {Counter(train[self.target])}")
+        mlflow.log_param("Number of values in train", Counter(train[self.target]))
         return train, test
 
     def train_base(self, train: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
@@ -95,12 +100,18 @@ class DataPreprocessor:
         logger.info(
             f"Number of values in X_train - base before balancing: {Counter(y_train)}"
         )
+        mlflow.log_param(
+            "Number of values in X_train - base before balancing", Counter(y_train)
+        )
 
         # balancing data
         X_train, y_train = self.over_sampling(X_train, y_train)
         logger.info(f"Shape of X_train - base after balancing: {X_train.shape}")
         logger.info(
             f"Number of values in X_train - base after balancing: {Counter(y_train)}"
+        )
+        mlflow.log_param(
+            "Number of values in X_train - base after balancing", Counter(y_train)
         )
 
         train = X_train, y_train
@@ -123,6 +134,7 @@ class DataPreprocessor:
         X_enc, y_enc = self.xy_split(ds_enc)
         logger.info(f"Shape of X_enc - autoencoder: {X_enc.shape}")
         logger.info(f"Number of values in X_enc - autoencoder: {Counter(y_enc)}")
+        mlflow.log_param("Number of values in X_enc - autoencoder", Counter(y_enc))
 
         # sample for logistic regression
         X_lr, y_lr = self.xy_split(ds_lr)
