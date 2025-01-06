@@ -5,6 +5,7 @@ import pandas as pd
 from loguru import logger
 from nyoka import skl_to_pmml
 from collections import Counter
+import matplotlib.pyplot as plt
 from sklearn.pipeline import Pipeline
 from catboost import CatBoostClassifier
 from tensorflow.keras import Model, Sequential
@@ -117,38 +118,99 @@ class Encoder:
 
     def autoenc_model(self) -> keras.Model:
         input_dim = self.X_enc.shape[1]
-        epochs = 25
-        batch_size = 256
+        epochs = 50
+        batch_size = 128
         val_split = 0.2
 
         input_layer = Input(shape=(input_dim,))
 
         # encoder
-        encoded = Dense(256, activation="tanh")(input_layer)
-        encoded = Dense(128, activation="relu")(encoded)
+        encoded = Dense(128, activation="tanh")(input_layer)
         encoded = Dense(64, activation="relu")(encoded)
+        encoded = Dense(16, activation="relu")(encoded)
         encoded = Dense(input_dim, activation="relu")(encoded)
 
         # decoder
-        decoded = Dense(64, activation="relu")(encoded)
-        decoded = Dense(128, activation="relu")(decoded)
-        decoded = Dense(256, activation="tanh")(decoded)
+        decoded = Dense(16, activation="relu")(encoded)
+        decoded = Dense(64, activation="relu")(decoded)
+        decoded = Dense(128, activation="tanh")(decoded)
 
         # output
         output_layer = Dense(input_dim, activation="relu")(decoded)
 
         autoencoder = Model(input_layer, output_layer)
-        autoencoder.compile(optimizer="adadelta", loss="mse")
+        autoencoder.compile(
+            metrics=["accuracy", "precision", "recall"],
+            loss="mean_squared_error",
+            optimizer=keras.optimizers.Adam(learning_rate=1e-5),
+        )
         autoencoder.summary()
-        autoencoder.fit(
+        history = autoencoder.fit(
             self.X_enc,
             self.X_enc,
             batch_size=batch_size,
             epochs=epochs,
             shuffle=True,
             validation_split=val_split,
+            verbose=1,
         )
+        # self.log_history(history)
+        for metric in ["loss", "accuracy", "precision", "recall"]:
+            self.plot_training_history(history, metric)
         return autoencoder
+
+    def plot_training_history(self, history, metric: str):
+        import matplotlib
+
+        matplotlib.use("Agg")
+
+        plt.figure(figsize=(8, 6))
+        plt.plot(history.history[metric], label=f"Train {metric.capitalize()}")
+        plt.plot(
+            history.history[f"val_{metric}"], label=f"Validation {metric.capitalize()}"
+        )
+        plt.xlabel("Epochs")
+        plt.ylabel(metric.capitalize())
+        plt.legend()
+        plt.grid()
+        plt.title(f"Training and Validation {metric.capitalize()}")
+        plt.savefig(f"training_{metric}_enc.png")
+        mlflow.log_artifact(f"training_{metric}_enc.png")
+        plt.savefig(f"val_{metric}_enc.png")
+        mlflow.log_artifact(f"val_{metric}_enc.png")
+
+    def log_history(self, history):
+
+        for epoch, metrics in enumerate(
+            zip(
+                history.history["loss"],
+                history.history["val_loss"],
+                history.history["accuracy"],
+                history.history["val_accuracy"],
+                history.history["precision"],
+                history.history["val_precision"],
+                history.history["recall"],
+                history.history["val_recall"],
+            )
+        ):
+            (
+                train_loss,
+                val_loss,
+                train_acc,
+                val_acc,
+                train_pr,
+                val_pr,
+                train_rec,
+                val_rec,
+            ) = metrics
+            mlflow.log_metric("train_loss_enc", train_loss, step=epoch)
+            mlflow.log_metric("val_loss_enc", val_loss, step=epoch)
+            mlflow.log_metric("accuracy_enc", train_acc, step=epoch)
+            mlflow.log_metric("val_accuracy_enc", val_acc, step=epoch)
+            mlflow.log_metric("precision_enc", train_pr, step=epoch)
+            mlflow.log_metric("val_precision_enc", val_pr, step=epoch)
+            mlflow.log_metric("recall_enc", train_rec, step=epoch)
+            mlflow.log_metric("val_recall_enc", val_rec, step=epoch)
 
     def hid_representaton(self, autoencoder: keras.Model) -> keras.Model:
         # add into hidden representation only encoding part
