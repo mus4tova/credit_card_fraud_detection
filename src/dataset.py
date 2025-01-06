@@ -5,6 +5,7 @@ from pathlib import Path
 from loguru import logger
 from collections import Counter
 from imblearn.over_sampling import SMOTE
+from kaggle.api.kaggle_api_extended import KaggleApi
 from sklearn.preprocessing import OrdinalEncoder, MinMaxScaler
 
 from src.settings import FEATURES, TARGET, BASE_DIR
@@ -12,29 +13,30 @@ from src.settings import FEATURES, TARGET, BASE_DIR
 
 class DataLoader:
     def __init__(self, mode: str):
+        # download file from kaggle
         self.download_file()
+        # read file with dataset
         self.dataset = self.load_data_from_file()
+        # split dataset into train and test
         self.length = int(len(self.dataset) * 0.95)
         if mode == "train":
             self.dataset = self.dataset[: self.length]
         elif mode == "predict":
             self.dataset = self.dataset[self.length :]
 
-    def is_folder_empty(self, folder_path):
+    def is_folder_empty(self, folder_path: str) -> bool:
         return not any(Path(folder_path).iterdir())
 
     def download_file(self):
-        from kaggle.api.kaggle_api_extended import KaggleApi
-
-        # Initialize API
+        # initialize API
         api = KaggleApi()
         api.authenticate()
 
-        # Set path and name
+        # set path and name
         dataset_name = "mlg-ulb/creditcardfraud"
         save_path = f"{BASE_DIR}/datasets/"
 
-        # download dataset
+        # download data
         if self.is_folder_empty(save_path):
             api.dataset_download_files(dataset_name, path=save_path, unzip=True)
             logger.info(f"Dataset downloaded and saved at {save_path}")
@@ -90,7 +92,6 @@ class DataPreprocessor:
         logger.info(f"Number of values in test: {Counter(test[self.target])}")
         mlflow.log_param("Number of values in test", Counter(test[self.target]))
         logger.info(f"Number of values in train: {Counter(train[self.target])}")
-        mlflow.log_param("Number of values in train", Counter(train[self.target]))
         return train, test
 
     def train_base(self, train: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
@@ -121,6 +122,8 @@ class DataPreprocessor:
         pd.DataFrame,
         tuple[pd.DataFrame, pd.DataFrame],
     ]:
+        """method for encoder+lr model, is used after self.get_train_test(),
+        return two dataframes - for autoencoder and for logistic regression"""
         # choose small sample to train unsupervised model - autoencoder
         sample_len = int(len(df) * 0.3)
         ds_enc = df[df[self.target] == 0][:sample_len]
@@ -149,6 +152,7 @@ class DataPreprocessor:
         return train_enc, train_lr
 
     def xy_split(self, df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+        """method for split data into features and target"""
         X = df.drop(columns=self.target, axis=1)
         y = df[self.target]
         return X, y
@@ -156,6 +160,7 @@ class DataPreprocessor:
     def over_sampling(
         self, X: pd.DataFrame, y: pd.DataFrame
     ) -> tuple[pd.DataFrame, pd.DataFrame]:
+        """method for balancing data"""
         logger.info(f"Shape before balancing: {Counter(y)}")
         X_bal, y_bal = SMOTE(sampling_strategy=0.5).fit_resample(X, y)
         logger.info(f"Shape after balancing: {Counter(y_bal)}")
