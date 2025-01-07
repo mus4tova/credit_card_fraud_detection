@@ -7,8 +7,8 @@ This predictor is designed to detect fraudulent credit card activity. It uses th
 ### Launching the predictor for training
 
 ```bash
-podman-compose -f docker-compose.yml build
-podman-compose -f docker-compose.yml up train
+docker-compose.yml build
+docker-compose.yml up train
 ```
 Training and prediction data are loaded from the Kaggle website using the Kaggle API (link to dataset https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud).
 Training progress is monitored in MLFlow on the local host: http://13.60.52.168:5000. 
@@ -53,7 +53,7 @@ Model files and threshold data are saved in the `models` folder.
 ### Launch predictor for predictions
 
 ```bash
-podman-compose -f docker-compose.yml up predict
+docker-compose.yml up predict
 ```
 
 ### Getting Predictions
