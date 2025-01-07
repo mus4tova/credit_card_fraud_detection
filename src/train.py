@@ -45,7 +45,6 @@ class ModelTrainer:
             p.map(self.train_one_model, self.models_list)
         end = time.time() - start
         logger.info(f"Running time (sec) using multiprocessing: {end}")
-        mlflow.log_param("Running time (sec) using multiprocessing", end)
         logger.info("Finish multiprocessing training")
 
         logger.info("==========================================")
