@@ -19,7 +19,7 @@ class ModelTrainer:
     def train_all_models(
         self,
     ) -> tuple[
-        dict[str, Pipeline | CatBoostClassifier],
+        dict[str, Pipeline or CatBoostClassifier],
         tuple[pd.DataFrame, pd.DataFrame],
     ]:
         # dataset for boosting and random forest

@@ -1,4 +1,4 @@
-import keras
+from tensorflow import keras
 import mlflow
 import numpy as np
 import pandas as pd
@@ -173,7 +173,7 @@ class ModelSaver:
 
     def save_model(
         self,
-        model: keras.Model | Pipeline | CatBoostClassifier,
+        model: keras.Model or Pipeline or CatBoostClassifier,
         features: list[str],
         model_type: str,
     ):

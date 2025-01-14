@@ -14,10 +14,11 @@ loguru = "0.7.2"
 numpy = "1.26.4"
 pandas = "2.2.3"
 scikit-learn = "1.5.2"
-catboost = "1.2.5"
+catboost = "1.2.7"
 imblearn = "^0.0"
 nyoka = "5.5.0"
 sklearn-pmml-model = "1.0.7"
+kaggle = "^1.6.17"
 
 
 [build-system]

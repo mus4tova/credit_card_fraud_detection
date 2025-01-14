@@ -25,7 +25,7 @@ from src.settings import MODELS_DIR, MODELS_LIST
 class ModelTester:
     def __init__(
         self,
-        models: dict[str, Pipeline | CatBoostClassifier],
+        models: dict[str, Pipeline or CatBoostClassifier],
         dataset: tuple[pd.DataFrame, pd.DataFrame],
     ):
         self.test_dataset = dataset
