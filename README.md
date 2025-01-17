@@ -3,6 +3,7 @@
 This predictor is designed to detect fraudulent credit card activity. It uses three model architectures: Random Forest, CatBoost, and Autoencoder + Logistic Regression. In the documentation, the model that combines Autoencoder + Logistic Regression is often referred to simply as "Encoder." The predictor is launched using Docker.
 
 ## Models traning
+Before launching, you can either manually save the dataset (link to dataset https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud), or click the `Create New Token` button in the `API` section using the link https://www.kaggle.com/settings/account and place the downloaded file in the folder `secrets`
 
 ### Launching the predictor for training
 
@@ -10,7 +11,6 @@ This predictor is designed to detect fraudulent credit card activity. It uses th
 docker-compose.yml build
 docker-compose.yml up train
 ```
-Training and prediction data are loaded from the Kaggle website using the Kaggle API (link to dataset https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud).
 Training progress is monitored in MLFlow on the local host: http://13.60.52.168:5000. 
 Default experiment name: **Credit Card Fraud Detection**.
 
