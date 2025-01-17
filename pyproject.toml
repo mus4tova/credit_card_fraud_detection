@@ -1,26 +1,24 @@
 [tool.poetry]
-name = "credit-card-fraud-detection"
+name = "my_docker_project"
 version = "0.1.0"
-description = ""
-authors = ["Natasha Musatova <natali.schimpl@gmail.com>"]
-readme = "README.md"
+description = "A simple Docker Compose project with Poetry"
+authors = ["Your Name <your.email@example.com>"]
 
 [tool.poetry.dependencies]
-python = "~3.10"
+python = ">=3.10,<3.12"
+mlflow = "^2.19.0"
+loguru = "^0.7.3"
+catboost = "^1.2.7"
 tensorflow-io-gcs-filesystem = "0.31.0"
-tensorflow = "2.18.0"
-mlflow = "2.17.2"
-loguru = "0.7.2"
-numpy = "1.26.4"
-pandas = "2.2.3"
-scikit-learn = "1.5.2"
-catboost = "1.2.7"
+tensorflow = "2.13.0"
 imblearn = "^0.0"
-nyoka = "5.5.0"
-sklearn-pmml-model = "1.0.7"
 kaggle = "^1.6.17"
-
+nyoka = "^5.5.0"
+sklearn-pmml-model = "^1.0.7"
+numpy = "1.24.3"
+pandas = "^2.2.3"
+scikit-learn = "^1.6.1"
 
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"

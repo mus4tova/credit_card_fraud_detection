@@ -4,6 +4,7 @@ services:
     restart: 'no'
     volumes:
       - /credit_card_fraud_detection/models/:/credit_card_fraud_detection/models
+      - ./secrets/kaggle.json:/root/.config/kaggle/kaggle.json
     command: python src/main.py --train
 
   predict:
