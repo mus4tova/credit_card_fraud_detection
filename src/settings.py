@@ -7,11 +7,11 @@ MODELS_DIR = BASE_DIR / "models"
 if not os.path.isdir(MODELS_DIR):
     os.mkdir(MODELS_DIR)
 
-if not os.path.isdir(BASE_DIR/'datasets'):
-    os.mkdir(BASE_DIR/'datasets')
+if not os.path.isdir(BASE_DIR / "datasets"):
+    os.mkdir(BASE_DIR / "datasets")
 
-if not os.path.isdir(BASE_DIR/'secrets'):
-    os.mkdir(BASE_DIR/'secrets')
+if not os.path.isdir(BASE_DIR / "secrets"):
+    os.mkdir(BASE_DIR / "secrets")
 
 PREDICTIONS_DIR = BASE_DIR / "predictions"
 if not os.path.isdir(PREDICTIONS_DIR):

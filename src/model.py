@@ -140,7 +140,7 @@ class Encoder:
 
         autoencoder = Model(input_layer, output_layer)
         autoencoder.compile(
-            metrics=["accuracy", "precision", "recall"],
+            metrics=["Accuracy", "Precision", "Recall"],
             loss="mean_squared_error",
             optimizer=keras.optimizers.Adam(learning_rate=1e-5),
         )
