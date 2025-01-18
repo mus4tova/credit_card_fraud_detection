@@ -1,0 +1,10 @@
+/models
+/predictions
+/datasets
+/secrets
+
+__pycache__/
+.idea/
+.env
+.venv
+
