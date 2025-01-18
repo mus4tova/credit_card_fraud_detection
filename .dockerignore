@@ -1,1 +1,8 @@
+__pycache__/
+/catboost_info
+src/catboost_info/
+
+.idea/
+.env
 .venv
+.git
