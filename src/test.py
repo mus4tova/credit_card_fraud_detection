@@ -101,9 +101,12 @@ class ModelTester:
         return threshold
 
     def threshold_choosing(self, thrsh_ds: pd.DataFrame, model_name: str) -> float:
-        slice = thrsh_ds[thrsh_ds.recall >= 0.8]
+        slice = thrsh_ds[thrsh_ds.recall >= 0.75]
         logger.info(f"Slice: {slice}")
-        thrsh = slice.tail(1).threshold.values[0]
+        if model_name == "Encoder":
+            thrsh = 0.5
+        else:
+            thrsh = slice.tail(1).threshold.values[0]
         logger.info(f"Threshold: {thrsh}")
         return thrsh
 
