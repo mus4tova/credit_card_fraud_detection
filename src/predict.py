@@ -1,6 +1,7 @@
 import os
 import json
 import pickle
+import mlflow
 import numpy as np
 import pandas as pd
 import tensorflow as tf
@@ -28,6 +29,7 @@ class ModelPredictor:
         data = data[self.features]
         data = pd.DataFrame(MinMaxScaler().fit_transform(data), columns=data.columns)
         logger.info(f"Data prepared for prediction: {data}")
+        mlflow.log_param(f"Dataset size", data.shape)
         return data
 
     def predict_one_model(self, model_type: str):
