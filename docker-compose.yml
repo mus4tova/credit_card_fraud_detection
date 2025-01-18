@@ -3,7 +3,7 @@ services:
     build: .
     restart: 'no'
     volumes:
-      - /credit_card_fraud_detection/models/:/credit_card_fraud_detection/models
+      - ./models:/credit_card_fraud_detection/models
       - ./secrets/kaggle.json:/root/.config/kaggle/kaggle.json
     command: python src/main.py --train
 
@@ -11,6 +11,6 @@ services:
     build: .
     restart: 'no'
     volumes:
-      - /credit_card_fraud_detection/predictions/:/credit_card_fraud_detection/predictions
+      - ./predictions/:/credit_card_fraud_detection/predictions
       - ./secrets/kaggle.json:/root/.config/kaggle/kaggle.json
     command: python src/main.py --predict
